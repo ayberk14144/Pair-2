@@ -6,28 +6,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductRepository implements IRepository<Product> {
-    private List<Product> products = new ArrayList<>();
+    List<Product> products = new ArrayList<Product>();
 
     @Override
-    public void add(Product entity) {
-        products.add(entity);
+    public void add(Product product) {
+        products.add(product);
     }
 
     @Override
     public void remove(int id) {
-        products.removeIf(p -> p.getId() == id);
+        Product productRemove = products.stream().filter(product -> product.getId() == id).findFirst().orElse(null);
+        if (productRemove == null) {
+            System.out.println(id + "li bir ürün yok.");
+            return;
+        }
+        products.remove(productRemove);
+        System.out.println(id + "'li ürün silindi.");
+
+    }
+    @Override
+    public List<Product> findAll() {
+        return products;
     }
 
     @Override
     public Product findById(int id) {
-        return products.stream()
-                .filter(p -> p.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return products.stream().filter(product -> product.getId() == id).findFirst().orElse(null);
     }
 
-    @Override
-    public List<Product> findAll() {
-        return products;
+    public int stockQuantity(int id) {
+        Product product1 = products.stream().filter(product -> product.getId() == id).findFirst().orElse(null);
+        assert product1 != null;
+        return product1.getStock();
     }
 }
