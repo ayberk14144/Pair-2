@@ -39,9 +39,6 @@ public class ProductService {
     public void listAll() {
 
         List<Product> products = productRepository.findAll();
-      //  products.stream().map(product ->
-        //    System.out.println("id: "+product.getId());
-
-         //);
+        return ;
     }
-}
+    }
