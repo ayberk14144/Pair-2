@@ -8,21 +8,21 @@ import java.util.List;
 
 public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
-    private final CustomerRepository customerRepository;
+    private ProductService productService;
+    private CustomerService customerService;
 
-    public OrderService(OrderRepository orderRepository,
-                        ProductRepository productRepository,
-                        CustomerRepository customerRepository) {
+
+    public OrderService(OrderRepository orderRepository, ProductService productService, CustomerService customerService) {
+
         this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
-        this.customerRepository = customerRepository;
+        this.customerService = customerService;
+        this.productService = productService;
     }
 
     @Override
     public Order createOrder(int orderId, int customerId, List<OrderItem> items) {
         // Müşteri var mı?
-        Customer customer = customerRepository.findById(customerId);
+        Customer customer = customerService.findById(customerId);
         if (customer == null) {
             throw new RuntimeException("Müşteri bulunamadı");
         }
@@ -34,7 +34,7 @@ public class OrderService implements IOrderService {
 
         // Stok kontrol et
         for (OrderItem item : items) {
-            Product product = productRepository.findById(item.getProductId());
+            Product product = productService.findById(item.getProductId());
             if (product == null) {
                 throw new RuntimeException("Ürün bulunamadı: " + item.getProductId());
             }
@@ -50,11 +50,11 @@ public class OrderService implements IOrderService {
 
         double total = 0;
         for (OrderItem item : items) {
-            Product product = productRepository.findById(item.getProductId());
+            Product product = productService.findById(item.getProductId());
 
             // Stok azalt
             product.setStock(product.getStock() - item.getQuantity());
-            productRepository.add(product);
+            productService.addProduct(product);
 
             // Fiyat hesapla
             double price = product.getPrice() * item.getQuantity();
@@ -95,7 +95,7 @@ public class OrderService implements IOrderService {
             return;
         }
 
-        Customer customer = customerRepository.findById(order.getCustomerId());
+        Customer customer = customerService.findById(order.getCustomerId());
 
         System.out.println("=== Sipariş Detayları ===");
         System.out.println("ID: " + order.getId());
@@ -104,7 +104,7 @@ public class OrderService implements IOrderService {
         System.out.println("Ürünler:");
 
         for (OrderItem item : order.getOrderItemList()) {
-            Product product = productRepository.findById(item.getProductId());
+            Product product = productService.findById(item.getProductId());
             String productName = product != null ? product.getName() : "Bilinmeyen";
             System.out.println("- " + productName + " x" + item.getQuantity() + " = " + item.getPrice() + " TL");
         }

@@ -14,13 +14,13 @@ public class ProductService implements IProductService {
         this.productRepository = productRepository;
     }
 
-    public Product addProduct(Product p) {
+    public void addProduct(Product p) {
         if (p == null) throw new IllegalArgumentException("Product cannot be null");
         if (p.getName() == null || p.getName().isBlank()) throw new IllegalArgumentException("Name is required");
         if (p.getPrice() < 0) throw new IllegalArgumentException("Price cannot be negative");
         if (p.getStock() < 0) throw new IllegalArgumentException("Stock cannot be negative");
         productRepository.add(p);
-        return p;
+        System.out.println(p.getName() + " eklendi.");
     }
 
     public boolean hasStock(int productId, int qty) {
@@ -37,8 +37,15 @@ public class ProductService implements IProductService {
     }
 
     public void listAll() {
-
         List<Product> products = productRepository.findAll();
-        return ;
+        products.stream().map(product -> {
+                    System.out.println("Id: " + product.getId() +
+                            "Name : " + product.getName() +
+                            "price : " + product.getPrice() +
+                            "Stock : " + product.getStock());
+                    return null;
+                }
+
+        );
     }
-    }
+}
